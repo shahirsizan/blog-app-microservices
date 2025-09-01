@@ -1,5 +1,6 @@
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
+import { AuthenticatedRequest } from "../middleware/isAuth.js";
 
 import { Request, Response } from "express";
 
@@ -28,5 +29,17 @@ export const loginUser = async (req: Request, res: Response) => {
 		});
 	} catch (error: any) {
 		res.status(500).json({ message: error.message });
+	}
+};
+
+export const myProfile = async (req: AuthenticatedRequest, res) => {
+	// non eed to declare type of `res`. It's just a response!
+	try {
+		const user = req.user;
+		res.json(user);
+	} catch (error: any) {
+		res.status(500).json({
+			message: error.message,
+		});
 	}
 };
