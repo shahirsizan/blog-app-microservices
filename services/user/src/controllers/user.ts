@@ -43,3 +43,22 @@ export const myProfile = async (req: AuthenticatedRequest, res) => {
 		});
 	}
 };
+
+export const getUserProfile = async (req, res) => {
+	try {
+		const user = await User.findById(req.params.id);
+
+		if (!user) {
+			res.status(404).json({
+				message: "No user with this id",
+			});
+			return;
+		}
+
+		res.json(user);
+	} catch (error: any) {
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
