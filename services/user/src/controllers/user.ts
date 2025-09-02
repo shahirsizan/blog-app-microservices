@@ -4,7 +4,7 @@ import { AuthenticatedRequest } from "../middleware/isAuth.js";
 
 import { Request, Response } from "express";
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: any) => {
 	try {
 		const { email, name, picture } = req.body;
 
@@ -32,7 +32,7 @@ export const loginUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const myProfile = async (req: AuthenticatedRequest, res) => {
+export const myProfile = async (req: AuthenticatedRequest, res: any) => {
 	// non eed to declare type of `res`. It's just a response!
 	try {
 		const user = req.user;
@@ -44,7 +44,7 @@ export const myProfile = async (req: AuthenticatedRequest, res) => {
 	}
 };
 
-export const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req: any, res: any) => {
 	try {
 		const user = await User.findById(req.params.id);
 
@@ -56,6 +56,36 @@ export const getUserProfile = async (req, res) => {
 		}
 
 		res.json(user);
+	} catch (error: any) {
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
+
+export const updateUser = async (req: AuthenticatedRequest, res: any) => {
+	try {
+		const { name, bio } = req.body;
+
+		const user = await User.findByIdAndUpdate(
+			req.user?._id,
+			{
+				name: name,
+				bio: bio,
+			},
+			{ new: true }
+		);
+
+		// As info updated, generate new token and send to user
+		const token = jwt.sign({ user }, process.env.JWT_SEC as string, {
+			expiresIn: "5d",
+		});
+
+		res.json({
+			message: "User Updated",
+			token,
+			user,
+		});
 	} catch (error: any) {
 		res.status(500).json({
 			message: error.message,
