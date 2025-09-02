@@ -1,8 +1,10 @@
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../middleware/isAuth.js";
+import { v2 as cloudinary } from "cloudinary";
 
 import { Request, Response } from "express";
+import getBuffer from "../utils/dataUri.js";
 
 export const loginUser = async (req: Request, res: any) => {
 	try {
@@ -83,6 +85,63 @@ export const updateUser = async (req: AuthenticatedRequest, res: any) => {
 
 		res.json({
 			message: "User Updated",
+			token,
+			user,
+		});
+	} catch (error: any) {
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
+
+export const updateProfilePic = async (req: AuthenticatedRequest, res: any) => {
+	try {
+		const file = req.file;
+
+		if (!file) {
+			res.status(400).json({
+				message: "No file to upload",
+			});
+			return;
+		}
+
+		// send the `file` object to getBuffer().
+		// The returned `fileBuffer` object, shaped like:
+		// {
+		// 	fileName?: string;
+		// 	mimetype?: string;
+		// 	content?: string;
+		// 	base64?: string;
+		// 	buffer?: Buffer;
+		// 	encode(fileName: string, handler?: DataURI.Callback): Promise<string | undefined>;
+		// 	format(fileName: string, fileContent: DataURI.Input): DataURIParser;
+		// 	private createMetadata;
+		// }
+		const fileBuffer = getBuffer(file);
+
+		const cloudinary_upload_response = await cloudinary.uploader.upload(
+			fileBuffer.content,
+			{
+				folder: "blogs",
+			}
+		);
+
+		const user = await User.findByIdAndUpdate(
+			req.user?._id,
+			{
+				image: cloudinary_upload_response.secure_url,
+			},
+			{ new: true }
+		);
+
+		// generate new toke for updated user info
+		const token = jwt.sign({ user }, process.env.JWT_SEC as string, {
+			expiresIn: "5d",
+		});
+
+		res.json({
+			message: "User Profile pic updated",
 			token,
 			user,
 		});

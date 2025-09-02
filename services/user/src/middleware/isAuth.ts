@@ -36,7 +36,7 @@ export const isAuth = async (
 			return;
 		}
 
-		// append `user` object to the `req` and pass to next controller
+		// append `user` object to `req` and pass to next()
 		req.user = decodeValue.user;
 		next();
 	} catch (error) {
