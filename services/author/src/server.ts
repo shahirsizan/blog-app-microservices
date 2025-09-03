@@ -3,6 +3,7 @@ import "dotenv/config";
 import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
 import { sql } from "./utils/db.js";
+import blogRoutes from "./routes/blog.js";
 
 // Cloudinary configuration
 cloudinary.config({
@@ -57,6 +58,8 @@ const initDB = async () => {
 		console.log("Error initDb", error);
 	}
 };
+
+app.use("/api/v1", blogRoutes);
 
 await initDB();
 app.listen(port, () => {
