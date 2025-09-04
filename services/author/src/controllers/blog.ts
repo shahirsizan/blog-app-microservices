@@ -5,27 +5,32 @@ export const createBlog = async (req: AuthenticatedRequest, res: any) => {
 	} catch (error: any) {}
 };
 
-export const updateBlog = async (req: AuthenticatedRequest, res: any) => {
-	try {
-	} catch (error: any) {}
-};
+// todo
+// export const updateBlog = async (req: AuthenticatedRequest, res: any) => {
+// 	try {
+// 	} catch (error: any) {}
+// };
 
-export const deleteBlog = async (req: AuthenticatedRequest, res: any) => {
-	try {
-	} catch (error: any) {}
-};
+// todo
+// export const deleteBlog = async (req: AuthenticatedRequest, res: any) => {
+// 	try {
+// 	} catch (error: any) {}
+// };
 
-export const aiTitleResponse = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {}
-};
+// todo
+// export const aiTitleResponse = async (req: any, res: any) => {
+// 	try {
+// 	} catch (error: any) {}
+// };
 
-export const aiDescriptionResponse = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {}
-};
+// todo
+// export const aiDescriptionResponse = async (req: any, res: any) => {
+// 	try {
+// 	} catch (error: any) {}
+// };
 
-export const aiBlogResponse = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {}
-};
+// todo
+// export const aiBlogResponse = async (req: any, res: any) => {
+// 	try {
+// 	} catch (error: any) {}
+// };
