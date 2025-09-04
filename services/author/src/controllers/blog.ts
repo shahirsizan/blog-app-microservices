@@ -128,10 +128,39 @@ export const updateBlog = async (req: any, res: any) => {
 };
 
 // todo
-// export const deleteBlog = async (req: AuthenticatedRequest, res: any) => {
-// 	try {
-// 	} catch (error: any) {}
-// };
+export const deleteBlog = async (req: any, res: any) => {
+	try {
+		const blog = await sql`SELECT * FROM blogs WHERE id = ${req.params.id}`;
+
+		if (!blog.length) {
+			res.status(404).json({
+				message: "No blog with this id",
+			});
+			return;
+		}
+
+		if (blog[0].author !== req.user?._id) {
+			res.status(401).json({
+				message: "You are not author of this blog",
+			});
+			return;
+		}
+
+		await sql`DELETE FROM savedblogs WHERE blogid = ${req.params.id}`;
+		await sql`DELETE FROM comments WHERE blogid = ${req.params.id}`;
+		await sql`DELETE FROM blogs WHERE id = ${req.params.id}`;
+
+		// await invalidateChacheJob(["blogs:*", `blog:${req.params.id}`]);
+
+		res.json({
+			message: "Blog Deleted",
+		});
+	} catch (error: any) {
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
 
 // todo
 // export const aiTitleResponse = async (req: any, res: any) => {
