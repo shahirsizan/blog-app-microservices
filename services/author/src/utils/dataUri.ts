@@ -1,7 +1,7 @@
 import DataUriParser from "datauri/parser.js";
 import path from "path";
 
-const getBuffer = (file: any) => {
+const getDataURIobj = (file: any) => {
 	// When you use Multer, each uploaded file is represented in `req.file` like this:
 	// 	{
 	//   fieldname: 'image',
@@ -31,4 +31,4 @@ const getBuffer = (file: any) => {
 	return dataURI;
 };
 
-export default getBuffer;
+export default getDataURIobj;

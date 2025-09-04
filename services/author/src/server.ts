@@ -58,10 +58,10 @@ const initDB = async () => {
 		console.log("Error initDb", error);
 	}
 };
+await initDB();
 
 app.use("/api/v1", blogRoutes);
 
-await initDB();
 app.listen(port, () => {
 	console.log(`Server is running on http://localhost:${port}`);
 });

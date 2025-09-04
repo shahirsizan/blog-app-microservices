@@ -2,15 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User, { IUser } from "../model/User.js";
 
-export interface AuthenticatedRequest extends Request {
-	user?: IUser | null;
-}
+// export interface AuthenticatedRequest extends Request {
+// 	user?: IUser | null;
+// }
 
-export const isAuth = async (
-	req: AuthenticatedRequest,
-	res: Response,
-	next: NextFunction
-): Promise<void> => {
+export const isAuth = async (req: any, res: any, next: any): Promise<void> => {
 	try {
 		const authHeader = req.headers.authorization;
 		console.log(authHeader);

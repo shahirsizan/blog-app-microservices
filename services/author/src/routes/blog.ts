@@ -1,18 +1,14 @@
 import express from "express";
+import { isAuth } from "../middleware/isAuth.js";
+import uploadFile from "../middleware/multer.js";
+import { createBlog, updateBlog } from "../controllers/blog.js";
 
 const router = express.Router();
 
+router.post("/blog/new", isAuth, uploadFile, createBlog);
+router.post("/blog/:id", isAuth, uploadFile, updateBlog);
 // todo
-// router.post(
-// 	"/blog/new",
-// 	authMiddleware,
-// 	uploadFileMiddleware,
-// 	createBlogController
-// );
-// todo
-// router.post("/blog/:id", authMiddleware, authMiddleware, updateBlogController);
-// todo
-// router.delete("/blog/:id", authMiddleware, deleteBlogController);
+router.delete("/blog/:id", authMiddleware, deleteBlogController);
 // todo
 // router.post("/ai/title", aiTitleResponseController);
 // todo

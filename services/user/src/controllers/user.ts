@@ -119,9 +119,8 @@ export const updateProfilePic = async (req: AuthenticatedRequest, res: any) => {
 		// 	private createMetadata;
 		// }
 		const fileBuffer = getBuffer(file);
-
 		const cloudinary_upload_response = await cloudinary.uploader.upload(
-			fileBuffer.content,
+			fileBuffer.content as string,
 			{
 				folder: "blogs",
 			}
