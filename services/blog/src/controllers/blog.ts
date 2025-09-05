@@ -1,5 +1,34 @@
+import { sql } from "../utils/db.js";
+
 export const getAllBlogs = async (req: any, res: any) => {
 	try {
+		// console.log("req.query: ", req.query);
+		const searchQuery = req.query.searchQuery;
+		const category = req.query.category;
+
+		// const { searchQuery = "", category = "" } = req.query;
+		let blogs;
+
+		if (searchQuery && category) {
+			blogs = await sql`select * from blogs where ( title ilike ${
+				"%" + searchQuery + "%"
+			} or description ilike ${
+				"%" + searchQuery + "%"
+			} ) and category = ${category} order by create_at desc`;
+		} else if (searchQuery) {
+			blogs = await sql`select * from blogs where ( title ilike ${
+				"%" + searchQuery + "%"
+			} or description ilike ${
+				"%" + searchQuery + "%"
+			}) order by create_at desc`;
+		} else if (category) {
+			blogs =
+				await sql`select * from blogs where category=${category} order by create_at desc`;
+		} else {
+			blogs = await sql`select * from blogs order by create_at desc`;
+		}
+
+		res.json(blogs);
 	} catch (error: any) {
 		console.log("error at getAllBlogs: ", error);
 		res.status(500).json({
