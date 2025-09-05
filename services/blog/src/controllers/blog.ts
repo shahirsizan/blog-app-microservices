@@ -1,3 +1,4 @@
+import axios from "axios";
 import { sql } from "../utils/db.js";
 
 export const getAllBlogs = async (req: any, res: any) => {
@@ -39,6 +40,28 @@ export const getAllBlogs = async (req: any, res: any) => {
 
 export const getSingleBlog = async (req: any, res: any) => {
 	try {
+		const blogid = req.params.id;
+
+		// fetch blog
+		const blog = await sql`SELECT * FROM blogs WHERE id = ${blogid}`;
+
+		if (blog.length === 0) {
+			res.status(404).json({
+				message: "no blog with this id",
+			});
+			return;
+		}
+
+		const blogAuthorId = blog[0].author;
+
+		// also fetch `authorsData` then append to blogData
+		const { data } = await axios.get(
+			`${process.env.USER_SERVICE_URL}/api/v1/user/${blogAuthorId}`
+		);
+
+		const responseData = { blog: blog[0], author: data };
+
+		res.json(responseData);
 	} catch (error: any) {
 		console.log("error at getSingleBlog: ", error);
 		res.status(500).json({

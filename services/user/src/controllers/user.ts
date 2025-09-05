@@ -1,6 +1,6 @@
 import User from "../model/User.js";
 import jwt from "jsonwebtoken";
-import { AuthenticatedRequest } from "../middleware/isAuth.js";
+// import { AuthenticatedRequest } from "../middleware/isAuth.js";
 import { v2 as cloudinary } from "cloudinary";
 
 import { Request, Response } from "express";
@@ -34,7 +34,7 @@ export const loginUser = async (req: Request, res: any) => {
 	}
 };
 
-export const myProfile = async (req: AuthenticatedRequest, res: any) => {
+export const myProfile = async (req: any, res: any) => {
 	// non eed to declare type of `res`. It's just a response!
 	try {
 		const user = req.user;
@@ -65,7 +65,7 @@ export const getUserProfile = async (req: any, res: any) => {
 	}
 };
 
-export const updateUser = async (req: AuthenticatedRequest, res: any) => {
+export const updateUser = async (req: any, res: any) => {
 	try {
 		const { name, bio } = req.body;
 
@@ -95,7 +95,7 @@ export const updateUser = async (req: AuthenticatedRequest, res: any) => {
 	}
 };
 
-export const updateProfilePic = async (req: AuthenticatedRequest, res: any) => {
+export const updateProfilePic = async (req: any, res: any) => {
 	try {
 		const file = req.file;
 
