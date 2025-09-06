@@ -19,3 +19,18 @@ export const connectRabbitMQ = async () => {
 		console.error("❌ Failed to connect to Rabbitmq: ", error);
 	}
 };
+
+export const publishToQueue = async (queueName: string, message: any) => {
+	// not necessary because we are establishing `connection` & creating `channel`
+	// at the very beginning of server initialization
+	// if (!channel) {
+	// 	console.error("Rabbitmq channel not intialized");
+	// 	return;
+	// }
+
+	await channel.assertQueue(queueName, { durable: true });
+
+	channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
+		presistent: true,
+	});
+};
