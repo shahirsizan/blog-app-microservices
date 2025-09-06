@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import cors from "cors";
 import { sql } from "./utils/db.js";
 import blogRoutes from "./routes/blog.js";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
 
 // Cloudinary configuration
 cloudinary.config({
@@ -58,7 +59,9 @@ const initDB = async () => {
 		console.log("Error initDb", error);
 	}
 };
+
 await initDB();
+await connectRabbitMQ();
 
 app.use("/api/v1", blogRoutes);
 
