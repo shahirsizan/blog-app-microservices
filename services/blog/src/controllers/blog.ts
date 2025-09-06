@@ -1,26 +1,45 @@
 import axios from "axios";
 import { sql } from "../utils/db.js";
+import { redisClient } from "../server.js";
 
 export const getAllBlogs = async (req: any, res: any) => {
 	try {
-		// console.log("req.query: ", req.query);
-		const searchQuery = req.query.searchQuery;
-		const category = req.query.category;
+		// The logical OR operator `||` returns the value on the right-hand side
+		// if the left value is falsy.
+		// `undefined`, `null`, 0, "" (empty string), and `false` are all falsy values.
+		// let searchKeyword = req.query.searchKeyword || "";
+		// let category = req.query.category || "";
 
-		// const { searchQuery = "", category = "" } = req.query;
+		let searchKeyword = req.query.searchKeyword ?? "";
+		let category = req.query.category ?? "";
+		// The nullish coalescing operator `??` returns the value on the right-hand side
+		// only if the left value is `null` or `undefined`.
+		// It does not treat other falsy values as defaults.
+
+		const cacheKey = `blogs:${searchKeyword}:${category}`;
+		const cachedData = await redisClient.get(cacheKey);
+		// if found in cache, return it
+		if (cachedData) {
+			console.log("Blogs served from Redis cache");
+			const parsedData = JSON.parse(cachedData);
+			res.json(parsedData);
+			return;
+		}
+
+		// not found in cache
+		// fetch from db
 		let blogs;
-
-		if (searchQuery && category) {
+		if (searchKeyword && category) {
 			blogs = await sql`select * from blogs where ( title ilike ${
-				"%" + searchQuery + "%"
+				"%" + searchKeyword + "%"
 			} or description ilike ${
-				"%" + searchQuery + "%"
+				"%" + searchKeyword + "%"
 			} ) and category = ${category} order by create_at desc`;
-		} else if (searchQuery) {
+		} else if (searchKeyword) {
 			blogs = await sql`select * from blogs where ( title ilike ${
-				"%" + searchQuery + "%"
+				"%" + searchKeyword + "%"
 			} or description ilike ${
-				"%" + searchQuery + "%"
+				"%" + searchKeyword + "%"
 			}) order by create_at desc`;
 		} else if (category) {
 			blogs =
@@ -28,6 +47,10 @@ export const getAllBlogs = async (req: any, res: any) => {
 		} else {
 			blogs = await sql`select * from blogs order by create_at desc`;
 		}
+
+		console.log("Blogs served from db");
+		// store to cache
+		await redisClient.set(cacheKey, JSON.stringify(blogs), { EX: 3600 });
 
 		res.json(blogs);
 	} catch (error: any) {
@@ -42,9 +65,19 @@ export const getSingleBlog = async (req: any, res: any) => {
 	try {
 		const blogid = req.params.id;
 
-		// fetch blog
-		const blog = await sql`SELECT * FROM blogs WHERE id = ${blogid}`;
+		const cacheKey = `blog:${blogid}`;
+		const cachedData = await redisClient.get(cacheKey);
+		// if found in cache, return it
+		if (cachedData) {
+			console.log("Blog Served from Redis cache");
+			const parsedData = JSON.parse(cachedData);
+			res.json(parsedData);
+			return;
+		}
 
+		// not found in cache
+		// fetch from db
+		const blog = await sql`SELECT * FROM blogs WHERE id = ${blogid}`;
 		if (blog.length === 0) {
 			res.status(404).json({
 				message: "no blog with this id",
@@ -60,6 +93,10 @@ export const getSingleBlog = async (req: any, res: any) => {
 		);
 
 		const responseData = { blog: blog[0], author: data };
+		// store to cache
+		await redisClient.set(cacheKey, JSON.stringify(responseData), {
+			EX: 3600,
+		});
 
 		res.json(responseData);
 	} catch (error: any) {
