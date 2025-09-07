@@ -12,6 +12,7 @@ const port = process.env.PORT;
 
 export const redisClient = await runRedis();
 
+// messageConsumer will run asynchronously in background
 startMessageConsumer();
 
 app.use("/api/v1", blogRoutes);

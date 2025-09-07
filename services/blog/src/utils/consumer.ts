@@ -8,6 +8,7 @@ interface messageFormat {
 	keys: string[];
 }
 
+// this will run asynchronously in background to receive messages
 export const startMessageConsumer = async () => {
 	try {
 		const queueName = "cache-invalidation";
@@ -42,12 +43,11 @@ export const startMessageConsumer = async () => {
 						channel.ack(msg);
 					}
 				} catch (error) {
+					channel.nack(msg, false, true);
 					console.error(
 						"❌ Error processing cache invalidation in blog service:",
 						error
 					);
-
-					channel.nack(msg, false, true);
 				}
 			}
 		});
