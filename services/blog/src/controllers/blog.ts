@@ -16,8 +16,9 @@ export const getAllBlogs = async (req: any, res: any) => {
 		// only if the left value is `null` or `undefined`.
 		// It does not treat other falsy values as defaults.
 
-		const cacheKey = `blogs:${searchKeyword}:${category}`;
-		const cachedData = await redisClient.get(cacheKey);
+		const cachedData = await redisClient.get(
+			`blogs:${searchKeyword}:${category}`
+		);
 		// if found in cache, return it
 		if (cachedData) {
 			console.log("Blogs served from Redis cache");
@@ -50,7 +51,11 @@ export const getAllBlogs = async (req: any, res: any) => {
 
 		console.log("Blogs served from db");
 		// store to cache
-		await redisClient.set(cacheKey, JSON.stringify(blogs), { EX: 3600 });
+		await redisClient.set(
+			`blogs:${searchKeyword}:${category}`,
+			JSON.stringify(blogs),
+			{ EX: 3600 }
+		);
 
 		res.json(blogs);
 	} catch (error: any) {
@@ -65,8 +70,7 @@ export const getSingleBlog = async (req: any, res: any) => {
 	try {
 		const blogid = req.params.id;
 
-		const cacheKey = `blog:${blogid}`;
-		const cachedData = await redisClient.get(cacheKey);
+		const cachedData = await redisClient.get(`blog:${blogid}`);
 		// if found in cache, return it
 		if (cachedData) {
 			console.log("Blog Served from Redis cache");
@@ -85,19 +89,19 @@ export const getSingleBlog = async (req: any, res: any) => {
 			return;
 		}
 
-		const blogAuthorId = blog[0].author;
-
 		// also fetch `authorsData` then append to blogData
+		const blogAuthorId = blog[0].author;
 		const { data } = await axios.get(
 			`${process.env.USER_SERVICE_URL}/api/v1/user/${blogAuthorId}`
 		);
 
 		const responseData = { blog: blog[0], author: data };
-		// store to cache
-		await redisClient.set(cacheKey, JSON.stringify(responseData), {
+		// repopulate cache
+		await redisClient.set(`blog:${blogid}`, JSON.stringify(responseData), {
 			EX: 3600,
 		});
 
+		console.log("Blog Served from db");
 		res.json(responseData);
 	} catch (error: any) {
 		console.log("error at getSingleBlog: ", error);

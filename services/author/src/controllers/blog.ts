@@ -1,6 +1,7 @@
 import cloudinary from "cloudinary";
 import getDataURIobj from "../utils/dataUri.js";
 import { sql } from "../utils/db.js";
+import { sendMsgToRabbitmq } from "../utils/rabbitmq.js";
 
 export const createBlog = async (req: any, res: any) => {
 	try {
@@ -54,7 +55,7 @@ export const createBlog = async (req: any, res: any) => {
 		const result =
 			await sql`INSERT INTO blogs (title, description, image, blogcontent,category, author) VALUES (${title}, ${description},${cloudinaryObj.secure_url},${blogcontent},${category},${req.user?._id}) RETURNING *`;
 
-		// await invalidateChacheJob(["blogs:*"]);
+		await sendMsgToRabbitmq("cache-invalidation", ["blogs:*"]);
 
 		res.json({
 			message: "Blog Created",
@@ -104,17 +105,20 @@ export const updateBlog = async (req: any, res: any) => {
 		}
 
 		const updatedBlog = await sql`UPDATE blogs SET
-    title = ${title || toBeUpdatedBlog[0].title},
-    description = ${description || toBeUpdatedBlog[0].description},
-    image= ${imageUrl},
-    blogcontent = ${blogcontent || toBeUpdatedBlog[0].blogcontent},
-    category = ${category || toBeUpdatedBlog[0].category}
+			title = ${title || toBeUpdatedBlog[0].title},
+			description = ${description || toBeUpdatedBlog[0].description},
+			image= ${imageUrl},
+			blogcontent = ${blogcontent || toBeUpdatedBlog[0].blogcontent},
+			category = ${category || toBeUpdatedBlog[0].category}
 
-    WHERE id = ${id}
-    RETURNING *
-    `;
+			WHERE id = ${id}
+			RETURNING *
+			`;
 
-		// await invalidateChacheJob(["blogs:*", `blog:${id}`]);
+		await sendMsgToRabbitmq("cache-invalidation", [
+			"blogs:*",
+			`blog:${id}`,
+		]);
 
 		res.json({
 			message: "Blog Updated",
@@ -150,7 +154,10 @@ export const deleteBlog = async (req: any, res: any) => {
 		await sql`DELETE FROM comments WHERE blogid = ${req.params.id}`;
 		await sql`DELETE FROM blogs WHERE id = ${req.params.id}`;
 
-		// await invalidateChacheJob(["blogs:*", `blog:${req.params.id}`]);
+		await sendMsgToRabbitmq("cache-invalidation", [
+			"blogs:*",
+			`blog:${req.params.id}`,
+		]);
 
 		res.json({
 			message: "Blog Deleted",
