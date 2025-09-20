@@ -5,10 +5,29 @@ import { v2 as cloudinary } from "cloudinary";
 
 import { Request, Response } from "express";
 import getBuffer from "../utils/dataUri.js";
+import { oauth2client } from "../utils/GoogleConfig.js";
+import axios from "axios";
 
 export const loginUser = async (req: Request, res: any) => {
 	try {
-		const { email, name, picture } = req.body;
+		const { code } = req.body;
+
+		if (!code) {
+			res.status(400).json({
+				message: "Authorization code is required!",
+			});
+			return;
+		}
+
+		const googleRes = await oauth2client.getToken(code);
+		oauth2client.setCredentials(googleRes.tokens);
+		const userRes = await axios.get(
+			`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+		);
+
+		console.log("user service -> userRes: ", userRes);
+
+		const { email, name, picture } = userRes.data as any;
 
 		let user = await User.findOne({ email: email });
 
