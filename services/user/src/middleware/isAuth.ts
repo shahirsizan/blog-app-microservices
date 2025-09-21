@@ -8,24 +8,24 @@ import User from "../model/User.js";
 
 export const isAuth = async (req: any, res: any, next: any): Promise<void> => {
 	try {
-		const authHeader = req.headers.authorization;
-		console.log(authHeader);
+		const authToken = req.headers.authorization;
+		console.log(authToken);
 
-		if (!authHeader) {
+		if (!authToken) {
 			res.status(401).json({
-				message: "Please Login - No auth header",
+				message: "❌ No Authorization Token - Please Login",
 			});
 			return;
 		}
 
-		const token = authHeader.split(" ")[1];
+		const token = authToken.split(" ")[1];
 
-		const decodeValue = jwt.verify(
+		const decodedValue = jwt.verify(
 			token,
 			process.env.JWT_SEC as string
 		) as JwtPayload;
 
-		if (!decodeValue) {
+		if (!decodedValue) {
 			res.status(401).json({
 				message: "Invalid token",
 			});
@@ -33,12 +33,12 @@ export const isAuth = async (req: any, res: any, next: any): Promise<void> => {
 		}
 
 		// append `user` object to `req` and pass to next()
-		req.user = decodeValue.user;
+		req.user = decodedValue.user;
 		next();
 	} catch (error) {
-		console.log("JWT verification error: ", error);
+		console.log("⚠️ Bearer token empty - Please Login: ", error);
 		res.status(401).json({
-			message: "Please Login - Jwt error",
+			message: "⚠️ Bearer token empty - Please Login",
 		});
 	}
 };

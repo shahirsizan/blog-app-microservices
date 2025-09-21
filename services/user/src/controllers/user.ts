@@ -14,23 +14,24 @@ export const loginUser = async (req: Request, res: any) => {
 
 		if (!code) {
 			res.status(400).json({
-				message: "Authorization code is required!",
+				message:
+					"Authorization code from Google not found in req.body!",
 			});
 			return;
 		}
 
+		// SEND THE `CODE` TO GOOGLE AND GET A `TOKEN`
 		const googleRes = await oauth2client.getToken(code);
 		oauth2client.setCredentials(googleRes.tokens);
-		const userRes = await axios.get(
+		// GET THE USER OBJECT
+		const userObjFromGoogle = await axios.get(
 			`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
 		);
 
-		console.log("user service -> userRes: ", userRes);
+		console.log("user service -> userObjFromGoogle: ", userObjFromGoogle);
 
-		const { email, name, picture } = userRes.data as any;
-
+		const { email, name, picture } = userObjFromGoogle.data as any;
 		let user = await User.findOne({ email: email });
-
 		if (!user) {
 			user = await User.create({
 				name,
@@ -44,7 +45,7 @@ export const loginUser = async (req: Request, res: any) => {
 		});
 
 		res.status(200).json({
-			message: "Login success",
+			message: "Login successful!",
 			token,
 			user,
 		});
