@@ -43,7 +43,6 @@ export const AppContextProvider = ({ children }) => {
 
 			setUser(data);
 			console.log("AppCOntext -> User data: ", data);
-
 			setIsAuthenticated(true);
 			setLoading(false);
 		} catch (error) {

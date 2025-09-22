@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,15 +16,16 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { AppContext, user_service_base_url } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import Loading from "@/components/loading";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
-	const { loading, setLoading, user, setUser } = useContext(AppContext);
 	const router = useRouter();
+	const { user, setUser } = useContext(AppContext);
+	const [isLoading, setIsLoading] = useState(true);
 
 	const googleResponseCallback = async (codeResponse) => {
-		// GOT AUTHORIZATION CODE, SEND IT TO `/login` API
-		setLoading(true);
+		setIsLoading(true);
 
 		try {
 			const result = await axios.post(
@@ -46,9 +47,10 @@ const LoginPage = () => {
 				path: "/",
 			});
 
-			toast.success(result.data.message);
-			setLoading(false);
+			toast.success("Logged in!");
+			setIsLoading(false);
 			setUser(result.data.user);
+			router.push("/");
 			console.log("result.data.user: ", result.data.user);
 		} catch (error) {
 			console.log(
@@ -56,7 +58,7 @@ const LoginPage = () => {
 				error
 			);
 			toast.error("Problem while logging in!");
-			setLoading(false);
+			setIsLoading(false);
 		}
 	};
 
@@ -67,13 +69,14 @@ const LoginPage = () => {
 	});
 
 	useEffect(() => {
+		setIsLoading(false);
 		if (user) {
 			router.push("/");
 		}
 	}, [user]);
 
-	if (loading) {
-		return <h1>Loading...</h1>;
+	if (isLoading) {
+		return <Loading />;
 	} else {
 		return (
 			<div className="LOGIN h-screen flex items-center justify-center">

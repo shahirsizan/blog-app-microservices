@@ -3,15 +3,31 @@ import { Button } from "@/components/ui/button";
 import { IoCloseOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { CiLogin } from "react-icons/ci";
+import { CgProfile } from "react-icons/cg";
+
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { AppContext } from "@/context/AppContext";
+import Loading from "./loading";
+import { redirect } from "next/navigation";
 
 const Navbar = () => {
+	const [isLoading, setIsLoading] = useState(true);
 	const [isOpen, setIsOpen] = useState(false);
+	const { user } = useContext(AppContext);
+
+	useEffect(() => {
+		setIsLoading(false);
+	}, []);
+
+	if (isLoading) {
+		return <Loading />;
+	}
 
 	return (
 		<nav className="NAVBAR sticky top-0 bg-white shadow-sm py-3 z-50 px-[5vw] md:px-[8vw] lg:px-[12vw]">
 			<div className=" flex justify-between items-center">
+				{/* LOGO */}
 				<Link
 					href={"/blogs"}
 					className="LOGO text-xl font-bold text-gray-900"
@@ -19,6 +35,7 @@ const Navbar = () => {
 					The Reading Retreat
 				</Link>
 
+				{/* HIDDEN MOBILE MENU BUTTON */}
 				<div className="MOBILEMENUBUTTON md:hidden">
 					<Button
 						variant={"ghost"}
@@ -32,6 +49,7 @@ const Navbar = () => {
 					</Button>
 				</div>
 
+				{/* NAV LINKS */}
 				<ul className="NAVLINKS hidden md:flex justify-center items-center space-x-6 text-gray-700">
 					<li>
 						<Link href={"/blogs"} className="hover:text-blue-500">
@@ -39,18 +57,26 @@ const Navbar = () => {
 						</Link>
 					</li>
 
-					<li>
-						<Link
-							href={"/blog/saved"}
-							className="hover:text-blue-500"
-						>
-							Saved Blogs
-						</Link>
-					</li>
+					{user && (
+						<li>
+							<Link
+								href={"/blog/saved"}
+								className="hover:text-blue-500"
+							>
+								Saved Blogs
+							</Link>
+						</li>
+					)}
 
-					<Link href={"/login"} className="hover:text-blue-500">
-						<CiLogin className="w-6 h-6" />
-					</Link>
+					{user ? (
+						<Link href={"/login"} className="hover:text-blue-500">
+							<CgProfile className="w-6 h-6" />
+						</Link>
+					) : (
+						<Link href={"/login"} className="hover:text-blue-500">
+							<CiLogin className="w-6 h-6" />
+						</Link>
+					)}
 				</ul>
 			</div>
 
