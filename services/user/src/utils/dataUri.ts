@@ -12,9 +12,9 @@ const getBuffer = (file: any) => {
 	//   size: 12345
 	// }
 
-	const parser = new DataUriParser();
-
 	const extName = path.extname(file.originalname);
+
+	const parser = new DataUriParser();
 	const dataURI = parser.format(extName, file.buffer);
 
 	// the dataURI object, usually shaped like this:
