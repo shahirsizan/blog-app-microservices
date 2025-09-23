@@ -32,7 +32,7 @@ export const isAuth = async (req: any, res: any, next: any): Promise<void> => {
 			return;
 		}
 
-		// append `user` object to `req` and pass to next()
+		// append `user` object to `req`, pass to next()
 		req.user = decodedValue.user;
 		next();
 	} catch (error) {

@@ -104,7 +104,7 @@ export const updateUser = async (req: any, res: any) => {
 		});
 
 		res.json({
-			message: "User Updated",
+			message: "User bio Updated",
 			token,
 			user,
 		});
@@ -138,6 +138,7 @@ export const updateProfilePic = async (req: any, res: any) => {
 		// 	format(fileName: string, fileContent: DataURI.Input): DataURIParser;
 		// 	private createMetadata;
 		// }
+
 		const fileBuffer = getBuffer(file);
 		const cloudinary_upload_response = await cloudinary.uploader.upload(
 			fileBuffer.content as string,
@@ -146,6 +147,7 @@ export const updateProfilePic = async (req: any, res: any) => {
 			}
 		);
 
+		// as image is uploaded to cloudinary, update the current user
 		const user = await User.findByIdAndUpdate(
 			req.user?._id,
 			{
@@ -160,7 +162,7 @@ export const updateProfilePic = async (req: any, res: any) => {
 		});
 
 		res.json({
-			message: "User Profile pic updated",
+			message: "✅ User profile pic updated.",
 			token,
 			user,
 		});
