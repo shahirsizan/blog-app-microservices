@@ -17,12 +17,16 @@ import { AppContext, user_service_base_url } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Loading from "@/components/loading";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const LoginPage = () => {
-	const router = useRouter();
-	const { user, setUser } = useContext(AppContext);
-	const [isLoading, setIsLoading] = useState(true);
+	const {
+		setUser,
+		isLoading,
+		setIsLoading,
+		isAuthenticated,
+		setIsAuthenticated,
+	} = useContext(AppContext);
 
 	const googleResponseCallback = async (codeResponse) => {
 		setIsLoading(true);
@@ -48,13 +52,15 @@ const LoginPage = () => {
 			});
 
 			toast.success("Logged in!");
+
 			setIsLoading(false);
+			setIsAuthenticated(true);
 			setUser(result.data.user);
-			router.push("/");
-			console.log("result.data.user: ", result.data.user);
+			console.log("LoginPage -> user: ", result.data.user);
+			redirect("/");
 		} catch (error) {
 			console.log(
-				"error -> LoginPage -> googleResponseCallback(): ",
+				"LoginPage -> error -> googleResponseCallback(): ",
 				error
 			);
 			toast.error("Problem while logging in!");
@@ -68,46 +74,41 @@ const LoginPage = () => {
 		flow: "auth-code",
 	});
 
-	useEffect(() => {
-		setIsLoading(false);
-		if (user) {
-			router.push("/");
-		}
-	}, [user]);
-
 	if (isLoading) {
 		return <Loading />;
-	} else {
-		return (
-			<div className="LOGIN h-screen flex items-center justify-center">
-				{" "}
-				<div className="w-[80vw] md:w-[50vw] lg:w-[40vw] shadow-lg">
-					<Card className="w-full">
-						<CardHeader>
-							<CardTitle className="text-center text-xl lg:text-3xl">
-								<span className="whitespace-nowrap">
-									LOGIN WITH
-								</span>
-							</CardTitle>
-						</CardHeader>
-
-						<CardContent className="text-center">
-							<Button
-								onClick={() => {
-									googleLogin();
-								}}
-							>
-								<span className="text-lg lg:text-2xl">
-									GOOGLE
-								</span>{" "}
-								<FcGoogle className="w-7 h-7" />
-							</Button>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
-		);
 	}
+
+	if (isAuthenticated) {
+		redirect("/");
+	}
+
+	return (
+		<div className="LOGIN h-screen flex items-center justify-center">
+			{" "}
+			<div className="w-[80vw] md:w-[50vw] lg:w-[40vw] shadow-lg">
+				<Card className="w-full">
+					<CardHeader>
+						<CardTitle className="text-center text-xl lg:text-3xl">
+							<span className="whitespace-nowrap">
+								LOGIN WITH
+							</span>
+						</CardTitle>
+					</CardHeader>
+
+					<CardContent className="text-center">
+						<Button
+							onClick={() => {
+								googleLogin();
+							}}
+						>
+							<span className="text-lg lg:text-2xl">GOOGLE</span>{" "}
+							<FcGoogle className="w-7 h-7" />
+						</Button>
+					</CardContent>
+				</Card>
+			</div>
+		</div>
+	);
 };
 
 export default LoginPage;
