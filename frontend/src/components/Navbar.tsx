@@ -1,24 +1,19 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { IoCloseOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { CiLogin } from "react-icons/ci";
 import { CgProfile } from "react-icons/cg";
-
 import Link from "next/link";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { AppContext } from "@/context/AppContext";
 import Loading from "./loading";
-import { redirect } from "next/navigation";
 
 const Navbar = () => {
-	const [isLoading, setIsLoading] = useState(true);
 	const [isOpen, setIsOpen] = useState(false);
-	const { user } = useContext(AppContext);
-
-	useEffect(() => {
-		setIsLoading(false);
-	}, []);
+	const { isAuthenticated, isLoading } = useContext(AppContext);
+	console.log("isAuthenticated: ", isAuthenticated);
 
 	if (isLoading) {
 		return <Loading />;
@@ -51,30 +46,33 @@ const Navbar = () => {
 
 				{/* NAV LINKS */}
 				<ul className="NAVLINKS hidden md:flex justify-center items-center space-x-6 text-gray-700">
-					<li>
+					{/* HOME  */}
+					<li className="space-x-3">
 						<Link href={"/blogs"} className="hover:text-blue-500">
 							Home
 						</Link>
 					</li>
 
-					{user && (
-						<li>
+					{/* SAVED & PROFILE */}
+					{isAuthenticated ? (
+						<li className="flex space-x-4">
 							<Link
 								href={"/blog/saved"}
 								className="hover:text-blue-500"
 							>
 								Saved Blogs
 							</Link>
-						</li>
-					)}
 
-					{user ? (
-						<Link href={"/login"} className="hover:text-blue-500">
-							<CgProfile className="w-6 h-6" />
-						</Link>
+							<Link
+								href={"/profile"}
+								className="hover:text-blue-500"
+							>
+								<CgProfile className="w-6 h-6" />
+							</Link>
+						</li>
 					) : (
 						<Link href={"/login"} className="hover:text-blue-500">
-							<CiLogin className="w-6 h-6" />
+							Login
 						</Link>
 					)}
 				</ul>
