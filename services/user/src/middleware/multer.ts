@@ -1,6 +1,6 @@
 import multer from "multer";
 
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage(); evabe korsilo age
 // memoryStorage -> for cloud
 // diskStorage -> for disk storage
 
@@ -14,6 +14,6 @@ const storage = multer.memoryStorage();
  * @param fieldName Name of the multipart form field to process.
  */
 
-const uploadFile = multer({ storage }).single("file");
+const uploadFile = multer({ storage: multer.memoryStorage() }).single("file");
 
 export default uploadFile;
