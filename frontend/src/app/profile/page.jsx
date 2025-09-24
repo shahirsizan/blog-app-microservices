@@ -37,11 +37,6 @@ const ProfilePage = () => {
 		bio: user?.bio || "",
 	});
 
-	// LOGOUT HANDLER
-	const logoutHandler = () => {
-		logoutUser();
-	};
-
 	// AFTER SELECTING IMAGE
 	const imageUploadHandler = async (e) => {
 		const file = e.target.files[0];
@@ -185,7 +180,7 @@ const ProfilePage = () => {
 									router.push("/blog/new");
 								}}
 							>
-								Create Blog
+								Add Blog
 							</Button>
 
 							{/* EDIT PROFILE DIALOG MODAL */}
