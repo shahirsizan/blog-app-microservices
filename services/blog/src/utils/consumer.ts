@@ -37,7 +37,7 @@ export const startMessageConsumer = async () => {
 									`🗑️ Blog service invalidated ${keys.length} cache keys matching: ${pattern}`
 								);
 								// original author of the project repopulated cache with db data.
-								// we gave that responsibility to the GET API calls instead.
+								// we don't do that here. Giving that responsibility to the GET API calls instead.
 							}
 						}
 						channel.ack(msg);
