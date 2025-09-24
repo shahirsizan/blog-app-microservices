@@ -31,6 +31,8 @@ const AddBlog = () => {
 	});
 	console.log(formData);
 
+	// 🧩🧩🧩 TODO: INCORPORATE GEMINI AI. SKipped part @ 6:52:30 ->
+
 	const handleFormSubmit = async (e) => {
 		e.preventDefault();
 		setIsLoading(true);
