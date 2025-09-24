@@ -43,7 +43,7 @@ export const blog_service_base_url = "http://localhost:5002";
 //     Local Storage Sync: If you want to save context data to local storage whenever it changes.
 // In summary, your components should directly consume context values, and you should only reach for useEffect when you need to perform an action or trigger an effect because a context value has changed.
 
-export const blogCategories = [
+const blogCategories = [
 	"Techonlogy",
 	"Health",
 	"Finance",
@@ -113,6 +113,7 @@ export const AppContextProvider = ({ children }) => {
 	});
 
 	const values = {
+		blogCategories,
 		fetchUser,
 		logoutUser,
 		user,
