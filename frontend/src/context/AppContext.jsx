@@ -103,8 +103,8 @@ export const AppContextProvider = ({ children }) => {
 		fetchUser();
 	}, []);
 
-	// IF AT ANY POINT, THE BROWSER TOKEN GETS DELETED BY ANY MEANS,
-	// WE'LL CHANGE THE FOLLOWING STATES
+	// IF AT ANY POINT, THE BROWSER TOKEN GETS
+	// DELETED, WE'LL UNAUTHENTICATE USER
 	useEffect(() => {
 		if (!Cookies.get("token")) {
 			setIsAuthenticated(false);
@@ -123,7 +123,6 @@ export const AppContextProvider = ({ children }) => {
 		isLoading,
 		setIsLoading,
 	};
-
 	return (
 		<AppContext.Provider value={values}>
 			<GoogleOAuthProvider clientId="42238302479-0v2c6m6jq7etke9gqfp55u70m4ifgoe4.apps.googleusercontent.com">

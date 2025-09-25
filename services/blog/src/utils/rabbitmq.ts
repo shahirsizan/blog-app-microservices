@@ -17,6 +17,6 @@ export const connectRabbitMQ = async (queueName: string) => {
 
 		return channel;
 	} catch (error) {
-		console.error("❌ Failed to connect to Rabbitmq: ", error);
+		console.error("❌ Failed to connect Rabbitmq: ", error);
 	}
 };
