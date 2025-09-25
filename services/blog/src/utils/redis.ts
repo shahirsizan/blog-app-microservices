@@ -16,21 +16,47 @@
 // 	console.log("Connected to redis.");
 // };
 
+// //////////////////////////////////////////////////////////////////////////////////////////////////
 // FOR: https://cloud.redis.io/#/databases/13539766/subscription/2900968/view-bdb/configuration
+// import { createClient } from "redis";
+
+// export const runRedis = async () => {
+// 	const redisClient = createClient({
+// 		username: "default",
+// 		password: "aKjwv9v2JH4fOfo71zSGL8foCwC37CSw",
+// 		socket: {
+// 			host: "redis-15207.c257.us-east-1-3.ec2.redns.redis-cloud.com",
+// 			port: 15207,
+// 		},
+// 	});
+
+// 	redisClient.on("error", (err) => console.log("❌ Redis Client Error", err));
+
+// 	await redisClient.connect();
+// 	return redisClient;
+// };
+
+///////////////////////////////////////////
+
 import { createClient } from "redis";
 
 export const runRedis = async () => {
+	console.log("in runRedis");
+
 	const redisClient = createClient({
 		username: "default",
-		password: "GAtHUHUlXWtO8arWLbaNeKuuaW3eM4Pf",
+		password: "aKjwv9v2JH4fOfo71zSGL8foCwC37CSw",
 		socket: {
-			host: "redis-15670.crce182.ap-south-1-1.ec2.redns.redis-cloud.com",
-			port: 15670,
+			host: "redis-15207.c257.us-east-1-3.ec2.redns.redis-cloud.com",
+			port: 15207,
 		},
 	});
 
-	redisClient.on("error", (err) => console.log("Redis Client Error", err));
+	redisClient.on("error", (err) => console.log("❌Redis Client Error", err));
 
 	await redisClient.connect();
-	return redisClient;
+
+	await redisClient.set("foo", "sizan");
+	const result = await redisClient.get("foo");
+	console.log("result: ", result); // >>> bar
 };
