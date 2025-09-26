@@ -44,6 +44,7 @@ export const blog_service_base_url = "http://localhost:5002";
 // In summary, your components should directly consume context values, and you should only reach for useEffect when you need to perform an action or trigger an effect because a context value has changed.
 
 const blogCategories = [
+	"All",
 	"Techonlogy",
 	"Health",
 	"Finance",
@@ -123,9 +124,11 @@ export const AppContextProvider = ({ children }) => {
 		}
 	};
 
+	// Video author nicher moto korse. But amar target search query lekhar por enter button press korle
+	// sekhan theke `fetchBlogs()` call hobe.
 	// useEffect(() => {
-	// 	fetchUser();
-	// }, []);
+	// 	fetchBlogs();
+	// }, [searchQuery, category]);
 
 	// IF AT ANY POINT, THE BROWSER TOKEN GETS
 	// DELETED, WE'LL UNAUTHENTICATE USER
@@ -151,6 +154,10 @@ export const AppContextProvider = ({ children }) => {
 		setIsLoading,
 		isBlogLoading,
 		setIsBlogLoading,
+		category,
+		setCategory,
+		searchQuery,
+		setSearchQuery,
 	};
 	return (
 		<AppContext.Provider value={values}>
