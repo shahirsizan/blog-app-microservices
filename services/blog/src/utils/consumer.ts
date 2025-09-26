@@ -1,5 +1,5 @@
 import amqp from "amqplib";
-import { redisClient } from "../server.js";
+import { redisClient } from "./redis.js";
 import { connectRabbitMQ } from "./rabbitmq.js";
 import { sql } from "./db.js";
 

@@ -2,7 +2,7 @@ import express from "express";
 import "dotenv/config";
 import blogRoutes from "./routes/blog.js";
 import cors from "cors";
-import { runRedis } from "./utils/redis.js";
+import { redisClient } from "./utils/redis.js";
 import { startMessageConsumer } from "./utils/consumer.js";
 
 const app = express();
@@ -10,7 +10,12 @@ app.use(express.json());
 app.use(cors());
 const port = process.env.PORT;
 
-export const redisClient = await runRedis();
+try {
+	await redisClient.connect();
+	console.log("✅ Redis Upstash connected!");
+} catch (error) {
+	console.log("❌ Redis Upstash error: ");
+}
 
 // We have some `GET` requests in this microservice.
 // We need a messageConsumer to know about any data change

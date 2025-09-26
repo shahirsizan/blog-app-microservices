@@ -1,6 +1,6 @@
 import axios from "axios";
+import { redisClient } from "../utils/redis.js";
 import { sql } from "../utils/db.js";
-import { redisClient } from "../server.js";
 
 export const getAllBlogs = async (req: any, res: any) => {
 	try {
@@ -19,6 +19,7 @@ export const getAllBlogs = async (req: any, res: any) => {
 		const cachedData = await redisClient.get(
 			`blogs:${searchKeyword}:${category}`
 		);
+
 		// if found in cache, return it
 		if (cachedData) {
 			console.log("Blogs served from Redis cache");
@@ -49,7 +50,7 @@ export const getAllBlogs = async (req: any, res: any) => {
 			blogs = await sql`select * from blogs order by create_at desc`;
 		}
 
-		console.log("Blogs served from db");
+		console.log("Blogs served from db: ", blogs);
 		// store to cache
 		await redisClient.set(
 			`blogs:${searchKeyword}:${category}`,
@@ -59,7 +60,7 @@ export const getAllBlogs = async (req: any, res: any) => {
 
 		res.json(blogs);
 	} catch (error: any) {
-		console.log("error at getAllBlogs: ", error);
+		console.log("❌try-catch error at getAllBlogs: ", error);
 		res.status(500).json({
 			message: error.message,
 		});
@@ -111,52 +112,52 @@ export const getSingleBlog = async (req: any, res: any) => {
 	}
 };
 
-export const addComment = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {
-		console.log("error at addComment: ", error);
-		res.status(500).json({
-			message: error.message,
-		});
-	}
-};
+// export const addComment = async (req, res) => {
+// 	try {
+// 	} catch (error) {
+// 		console.log("error at addComment: ", error);
+// 		res.status(500).json({
+// 			message: error.message,
+// 		});
+// 	}
+// };
 
-export const getAllComments = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {
-		console.log("error at getAllComments: ", error);
-		res.status(500).json({
-			message: error.message,
-		});
-	}
-};
+// export const getAllComments = async (req, res) => {
+// 	try {
+// 	} catch (error) {
+// 		console.log("error at getAllComments: ", error);
+// 		res.status(500).json({
+// 			message: error.message,
+// 		});
+// 	}
+// };
 
-export const deleteComment = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {
-		console.log("error at deleteComment: ", error);
-		res.status(500).json({
-			message: error.message,
-		});
-	}
-};
+// export const deleteComment = async (req, res) => {
+// 	try {
+// 	} catch (error) {
+// 		console.log("error at deleteComment: ", error);
+// 		res.status(500).json({
+// 			message: error.message,
+// 		});
+// 	}
+// };
 
-export const saveBlog = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {
-		console.log("error at saveBlog: ", error);
-		res.status(500).json({
-			message: error.message,
-		});
-	}
-};
+// export const saveBlog = async (req, res) => {
+// 	try {
+// 	} catch (error) {
+// 		console.log("error at saveBlog: ", error);
+// 		res.status(500).json({
+// 			message: error.message,
+// 		});
+// 	}
+// };
 
-export const getSavedBlog = async (req: any, res: any) => {
-	try {
-	} catch (error: any) {
-		console.log("error at : ", error);
-		res.status(500).json({
-			message: error.message,
-		});
-	}
-};
+// export const getSavedBlog = async (req, res) => {
+// 	try {
+// 	} catch (error) {
+// 		console.log("error at : ", error);
+// 		res.status(500).json({
+// 			message: error.message,
+// 		});
+// 	}
+// };
