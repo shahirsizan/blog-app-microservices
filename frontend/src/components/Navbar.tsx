@@ -6,14 +6,18 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { CiLogin } from "react-icons/ci";
 import { CgProfile } from "react-icons/cg";
 import Link from "next/link";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/context/AppContext";
 import Loading from "./loading";
 
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { isAuthenticated, isLoading } = useContext(AppContext);
+	const { fetchUser, isAuthenticated, isLoading } = useContext(AppContext);
 	console.log("isAuthenticated: ", isAuthenticated);
+
+	useEffect(() => {
+		fetchUser();
+	}, []);
 
 	if (isLoading) {
 		return <Loading />;
