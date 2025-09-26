@@ -31,7 +31,7 @@ const Navbar = () => {
 					href={"/blogs"}
 					className="LOGO text-xl font-bold text-gray-900"
 				>
-					The Reading Retreat
+					Blogss
 				</Link>
 
 				{/* HIDDEN MOBILE MENU BUTTON */}
