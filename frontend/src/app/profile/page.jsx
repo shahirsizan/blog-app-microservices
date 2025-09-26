@@ -22,6 +22,7 @@ import { redirect, useRouter } from "next/navigation";
 
 const ProfilePage = () => {
 	const {
+		fetchUser,
 		logoutUser,
 		isLoading,
 		setIsLoading,
@@ -36,6 +37,10 @@ const ProfilePage = () => {
 		name: user?.name || "",
 		bio: user?.bio || "",
 	});
+
+	useEffect(() => {
+		fetchUser();
+	}, []);
 
 	// AFTER SELECTING IMAGE
 	const imageUploadHandler = async (e) => {
