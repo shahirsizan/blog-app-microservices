@@ -60,6 +60,7 @@ export const AppContextProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 
+	// FETCH USER
 	const fetchUser = async () => {
 		try {
 			const token = Cookies.get("token");
@@ -80,7 +81,7 @@ export const AppContextProvider = ({ children }) => {
 				}
 			);
 
-			console.log("Context -> User data: ", data);
+			// console.log("Context -> User data: ", data);
 
 			setUser(data);
 			setIsAuthenticated(true);
@@ -91,6 +92,7 @@ export const AppContextProvider = ({ children }) => {
 		}
 	};
 
+	// LOGOUT USER
 	const logoutUser = async () => {
 		Cookies.remove("token");
 		setUser(null);
@@ -99,9 +101,31 @@ export const AppContextProvider = ({ children }) => {
 		toast.success("✅ Logged Out");
 	};
 
-	useEffect(() => {
-		fetchUser();
-	}, []);
+	const [isBlogLoading, setIsBlogLoading] = useState(true);
+	const [blogs, setBlogs] = useState(null);
+	const [category, setCategory] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
+
+	// FETCH BLOGS
+	const fetchBlogs = async () => {
+		setIsBlogLoading(true);
+
+		try {
+			const { data } = await axios.get(
+				`${blog_service_base_url}/api/v1/blog/all?searchQuery=${searchQuery}&category=${category}`
+			);
+
+			setBlogs(data);
+			setIsBlogLoading(false);
+		} catch (error) {
+			console.log("❌error loading blogs: ", error);
+			setIsBlogLoading(false);
+		}
+	};
+
+	// useEffect(() => {
+	// 	fetchUser();
+	// }, []);
 
 	// IF AT ANY POINT, THE BROWSER TOKEN GETS
 	// DELETED, WE'LL UNAUTHENTICATE USER
@@ -116,12 +140,17 @@ export const AppContextProvider = ({ children }) => {
 		blogCategories,
 		fetchUser,
 		logoutUser,
+		fetchBlogs,
 		user,
 		setUser,
+		blogs,
+		setBlogs,
 		isAuthenticated,
 		setIsAuthenticated,
 		isLoading,
 		setIsLoading,
+		isBlogLoading,
+		setIsBlogLoading,
 	};
 	return (
 		<AppContext.Provider value={values}>
