@@ -2,6 +2,8 @@ import axios from "axios";
 import { redisClient } from "../utils/redis.js";
 import { sql } from "../utils/db.js";
 
+const cacheEnabled = false;
+
 export const getAllBlogs = async (req: any, res: any) => {
 	try {
 		// The logical OR operator `||` returns the value on the right-hand side
@@ -10,22 +12,29 @@ export const getAllBlogs = async (req: any, res: any) => {
 		// let searchKeyword = req.query.searchKeyword || "";
 		// let category = req.query.category || "";
 
-		let searchKeyword = req.query.searchKeyword ?? "";
-		let category = req.query.category ?? "";
+		let searchKeyword = req.query.searchQuery ?? "";
+		// let category = req.query.category ?? "";
+		let category =
+			req.query.category === "All" || req.query.category === ""
+				? ""
+				: req.query.category;
 		// The nullish coalescing operator `??` returns the value on the right-hand side
 		// only if the left value is `null` or `undefined`.
 		// It does not treat other falsy values as defaults.
 
-		const cachedData = await redisClient.get(
-			`blogs:${searchKeyword}:${category}`
-		);
+		// 	DON'T WANT TO CROSS UPSTASH ALLOCATION CAP.
+		if (cacheEnabled) {
+			const cachedData = await redisClient.get(
+				`blogs:${searchKeyword}:${category}`
+			);
 
-		// if found in cache, return it
-		if (cachedData) {
-			console.log("Blogs served from Redis cache");
-			const parsedData = JSON.parse(cachedData);
-			res.json(parsedData);
-			return;
+			// if found in cache, return it
+			if (cachedData) {
+				console.log("Blogs served from Redis cache");
+				const parsedData = JSON.parse(cachedData);
+				res.json(parsedData);
+				return;
+			}
 		}
 
 		// not found in cache
@@ -50,7 +59,7 @@ export const getAllBlogs = async (req: any, res: any) => {
 			blogs = await sql`select * from blogs order by create_at desc`;
 		}
 
-		console.log("Blogs served from db: ", blogs);
+		console.log("Blogs served from db");
 		// store to cache
 		await redisClient.set(
 			`blogs:${searchKeyword}:${category}`,
