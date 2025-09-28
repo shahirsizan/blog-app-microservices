@@ -80,14 +80,14 @@ export const getSingleBlog = async (req: any, res: any) => {
 	try {
 		const blogid = req.params.id;
 
-		const cachedData = await redisClient.get(`blog:${blogid}`);
-		// if found in cache, return it
-		if (cachedData) {
-			console.log("Blog Served from Redis cache");
-			const parsedData = JSON.parse(cachedData);
-			res.json(parsedData);
-			return;
-		}
+		// REDIS DISABLED
+		// const cachedData = await redisClient.get(`blog:${blogid}`);
+		// if (cachedData) {
+		// 	console.log("Blog Served from Redis cache");
+		// 	const parsedData = JSON.parse(cachedData);
+		// 	res.json(parsedData);
+		// 	return;
+		// }
 
 		// not found in cache
 		// fetch from db
@@ -106,10 +106,12 @@ export const getSingleBlog = async (req: any, res: any) => {
 		);
 
 		const responseData = { blog: blog[0], author: data };
+
+		// REDIS DISABLED
 		// repopulate cache
-		await redisClient.set(`blog:${blogid}`, JSON.stringify(responseData), {
-			EX: 3600,
-		});
+		// await redisClient.set(`blog:${blogid}`, JSON.stringify(responseData), {
+		// 	EX: 3600,
+		// });
 
 		console.log("Blog Served from db");
 		res.json(responseData);

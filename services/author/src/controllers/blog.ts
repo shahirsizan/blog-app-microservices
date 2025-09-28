@@ -131,10 +131,10 @@ export const updateBlog = async (req: any, res: any) => {
 	}
 };
 
-// todo
 export const deleteBlog = async (req: any, res: any) => {
 	try {
-		const blog = await sql`SELECT * FROM blogs WHERE id = ${req.params.id}`;
+		const Id = req.params.id;
+		const blog = await sql`SELECT * FROM blogs WHERE id = ${Id}`;
 
 		if (!blog.length) {
 			res.status(404).json({
@@ -150,14 +150,15 @@ export const deleteBlog = async (req: any, res: any) => {
 			return;
 		}
 
-		await sql`DELETE FROM savedblogs WHERE blogid = ${req.params.id}`;
-		await sql`DELETE FROM comments WHERE blogid = ${req.params.id}`;
-		await sql`DELETE FROM blogs WHERE id = ${req.params.id}`;
+		await sql`DELETE FROM savedblogs WHERE blogid = ${Id}`;
+		await sql`DELETE FROM comments WHERE blogid = ${Id}`;
+		await sql`DELETE FROM blogs WHERE id = ${Id}`;
 
-		await sendMsgToRabbitmq("cache-invalidation", [
-			"blogs:*",
-			`blog:${req.params.id}`,
-		]);
+		// RABBITMQ DISABLED
+		// await sendMsgToRabbitmq("cache-invalidation", [
+		// 	"blogs:*",
+		// 	`blog:${Id}`,
+		// ]);
 
 		res.json({
 			message: "Blog Deleted",
