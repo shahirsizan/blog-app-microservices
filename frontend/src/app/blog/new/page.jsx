@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useContext, useState } from "react";
@@ -196,6 +198,18 @@ const AddBlog = () => {
 						<div>
 							<Label>Upload Image</Label>
 							<br />
+							{formData.image && (
+								<img
+									src={
+										typeof formData.image === "string"
+											? formData.image
+											: URL.createObjectURL(
+													formData.image
+												)
+									}
+									className="w-40 h-40 object-cover rounded mb-2"
+								/>
+							)}
 							<Input
 								className="max-w-fit"
 								type="file"
