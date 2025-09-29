@@ -77,9 +77,9 @@ const BlogPage = () => {
 			// 		const responseData = { blog: blog[0], author: data };
 			// 		res.json(responseData);
 			setBlog(data.blog);
-			console.log("Single blog: ", data.blog);
+			// console.log("Single blog: ", data.blog);
 			setBlogAuthor(data.author);
-			console.log("Author: ", data.author);
+			// console.log("Author: ", data.author);
 		} catch (error: any) {
 			console.log("❌ error -> fetchSingleBlog(): ", error);
 			if (error.response.status === 404) {
@@ -129,7 +129,7 @@ const BlogPage = () => {
 			const { data } = await axios.get(
 				`${blog_service_base_url}/api/v1/comments/${id}`
 			);
-			console.log("data: ", data);
+			// console.log("data: ", data);
 
 			setComments(data);
 			setIsPageLoading(false);

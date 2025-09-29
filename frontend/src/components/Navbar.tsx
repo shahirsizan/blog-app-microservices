@@ -13,7 +13,7 @@ import Loading from "./loading";
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { fetchUser, isAuthenticated, isLoading } = useContext(AppContext);
-	console.log("isAuthenticated: ", isAuthenticated);
+	// console.log("isAuthenticated: ", isAuthenticated);
 
 	useEffect(() => {
 		fetchUser();

@@ -56,7 +56,7 @@ const LoginPage = () => {
 			setIsLoading(false);
 			setIsAuthenticated(true);
 			setUser(result.data.user);
-			console.log("LoginPage -> user: ", result.data.user);
+			// console.log("LoginPage -> user: ", result.data.user);
 			redirect("/");
 		} catch (error) {
 			console.log(
