@@ -1,8 +1,9 @@
 import express from "express";
 import {
-	// addComment,
-	// deleteComment,
+	addComment,
+	deleteComment,
 	getAllBlogs,
+	getAllComments,
 	getSingleBlog,
 	// getAllComments,
 	// getSavedBlog,
@@ -15,9 +16,9 @@ const router = express.Router();
 
 router.get("/blog/all", getAllBlogs);
 router.get("/blog/:id", getSingleBlog);
-// router.post("/comment/:id", isAuth, addComment);
-// router.get("/comments/:id", getAllComments);
-// router.delete("/comment/:commentid", isAuth, deleteComment);
+router.post("/comment/:id", isAuth, addComment);
+router.get("/comments/:id", getAllComments);
+router.delete("/comment/:commentid", isAuth, deleteComment);
 // router.post("/save/:blogid", isAuth, saveBlog);
 // router.get("/blog/saved/all", isAuth, getSavedBlog);
 

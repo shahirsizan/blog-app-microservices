@@ -123,35 +123,64 @@ export const getSingleBlog = async (req: any, res: any) => {
 	}
 };
 
-// export const addComment = async (req, res) => {
-// 	try {
-// 	} catch (error) {
-// 		console.log("error at addComment: ", error);
-// 		res.status(500).json({
-// 			message: error.message,
-// 		});
-// 	}
-// };
+export const getAllComments = async (req: any, res: any) => {
+	const { id } = req.params;
 
-// export const getAllComments = async (req, res) => {
-// 	try {
-// 	} catch (error) {
-// 		console.log("error at getAllComments: ", error);
-// 		res.status(500).json({
-// 			message: error.message,
-// 		});
-// 	}
-// };
+	const comments =
+		await sql`SELECT * FROM comments WHERE blogid = ${id} ORDER BY create_at DESC`;
 
-// export const deleteComment = async (req, res) => {
-// 	try {
-// 	} catch (error) {
-// 		console.log("error at deleteComment: ", error);
-// 		res.status(500).json({
-// 			message: error.message,
-// 		});
-// 	}
-// };
+	console.log("comments: ", comments);
+
+	res.json(comments);
+};
+
+export const addComment = async (req: any, res: any) => {
+	try {
+		const { id: blogid } = req.params;
+		const { comment } = req.body;
+		const user = req.user;
+
+		await sql`INSERT INTO comments (comment, blogid, userid, username) VALUES (${comment}, ${blogid}, ${user?._id}, ${user?.name}) RETURNING *`;
+
+		res.json({
+			message: "Comment Added",
+		});
+	} catch (error: any) {
+		console.log("error -> addComment(): ", error);
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
+
+export const deleteComment = async (req: any, res: any) => {
+	try {
+		const { commentid } = req.params;
+
+		const comment =
+			await sql`SELECT * FROM comments WHERE id = ${commentid}`;
+
+		// console.log(comment);
+
+		if (comment[0].userid !== req.user?._id) {
+			res.status(401).json({
+				message: "You are not owner of this comment",
+			});
+			return;
+		}
+
+		await sql`DELETE FROM comments WHERE id = ${commentid}`;
+
+		res.json({
+			message: "Comment Deleted",
+		});
+	} catch (error: any) {
+		console.log("error -> deleteComment(): ", error);
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
 
 // export const saveBlog = async (req, res) => {
 // 	try {
