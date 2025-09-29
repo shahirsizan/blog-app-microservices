@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -21,18 +21,17 @@ const SideBar = () => {
 	const {
 		fetchBlogs,
 		blogCategories,
+		category,
 		setCategory,
 		searchQuery,
 		setSearchQuery,
 	} = useContext(AppContext);
 
-	const [selectedOption, setSelectedOption] = useState("");
-
 	return (
 		<Sidebar className="mt-[52px]">
 			<SidebarContent className="bg-white ">
 				<SidebarGroup>
-					{/* SEARCH QUERY. TRIGGERS UPON CLICKING BUTTON */}
+					{/* SEARCH QUERY */}
 					<SidebarGroupLabel>Search</SidebarGroupLabel>
 					<Input
 						type="text"
@@ -43,31 +42,28 @@ const SideBar = () => {
 						placeholder="Search blog"
 					/>
 
-					{/* CATEGORY. TRIGGERS UPON BEING SELECTED AN OPTION */}
+					{/* CATEGORY*/}
 					<SidebarGroupLabel>Categories</SidebarGroupLabel>
 					<SidebarMenu>
 						<SidebarMenuItem>
 							{/* CATEGORIES */}
-							{blogCategories?.map(
-								(category: string, idx: number) => {
-									return (
-										<SidebarMenuButton
-											key={idx}
-											onClick={() => {
-												setSelectedOption(category);
-												setCategory(category);
-											}}
-										>
-											{selectedOption === category ? (
-												<MdCheckBox />
-											) : (
-												<MdCheckBoxOutlineBlank />
-											)}{" "}
-											<span>{category}</span>
-										</SidebarMenuButton>
-									);
-								}
-							)}
+							{blogCategories?.map((cat: string, idx: number) => {
+								return (
+									<SidebarMenuButton
+										key={idx}
+										onClick={() => {
+											setCategory(cat);
+										}}
+									>
+										{cat === category ? (
+											<MdCheckBox />
+										) : (
+											<MdCheckBoxOutlineBlank />
+										)}{" "}
+										<span>{cat}</span>
+									</SidebarMenuButton>
+								);
+							})}
 						</SidebarMenuItem>
 					</SidebarMenu>
 
