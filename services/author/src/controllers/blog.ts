@@ -71,11 +71,35 @@ export const createBlog = async (req: any, res: any) => {
 export const updateBlog = async (req: any, res: any) => {
 	try {
 		const { id } = req.params;
-		const { title, description, blogcontent, category } = req.body;
+		const { authorId, title, description, blogcontent, category } =
+			req.body;
 		const file = req.file;
 
-		const toBeUpdatedBlog = await sql`SELECT * FROM blogs WHERE id = ${id}`;
+		// req.user object is:
+		// [1]   user: {
+		// [1]     _id: '68d033c2c8d3c05f48030914',
+		// [1]     name: 'Shahir Adil Sizan',
+		// [1]     email: 'shahir.sizan18@gmail.com',
+		// [1]     image: 'https://res.cloudinary.com/deh1ctb1t/image/upload/v1758650283/blogs/eo5a8ljllmmqpm5knzfp.png',
+		// [1]     createdAt: '2025-09-21T17:20:02.810Z',
+		// [1]     updatedAt: '2025-09-23T17:58:33.166Z',
+		// [1]     __v: 0,
+		// [1]     bio: 'Software Engineer'
+		// [1]   },
+		// [1]   iat: 1759084397,
+		// [1]   exp: 1759516397
+		// [1] }
 
+		// NICHER PROCEDURE TA AMI NIJE NIJE KORSI. BUT ORIGINAL TUTOR ONNOVABE KORSE
+		// NICHE DEKHO. DUITAI OK
+		// if (authorId !== req.user._id) {
+		// 	res.status(403).json({
+		// 		message: "You don’t have permission to edit the post.",
+		// 	});
+		// 	return;
+		// }
+
+		const toBeUpdatedBlog = await sql`SELECT * FROM blogs WHERE id = ${id}`;
 		if (!toBeUpdatedBlog.length) {
 			res.status(404).json({
 				message: "No blog with this id",
@@ -84,16 +108,17 @@ export const updateBlog = async (req: any, res: any) => {
 		}
 
 		if (toBeUpdatedBlog[0].author !== req.user?._id) {
-			res.status(401).json({
+			res.status(403).json({
 				message: "You are not the author of the blog",
 			});
 			return;
 		}
 
-		let imageUrl = toBeUpdatedBlog[0].image;
+		// CLOUDINARY
+		let oldImageUrl = toBeUpdatedBlog[0].image;
+		let newImageUrl = "";
 		if (file) {
 			const dataURIobj = getDataURIobj(file);
-
 			const cloudinaryObj = await cloudinary.v2.uploader.upload(
 				dataURIobj.content as string,
 				{
@@ -101,24 +126,27 @@ export const updateBlog = async (req: any, res: any) => {
 				}
 			);
 
-			imageUrl = cloudinaryObj.secure_url;
+			newImageUrl = cloudinaryObj.secure_url;
 		}
 
 		const updatedBlog = await sql`UPDATE blogs SET
-			title = ${title || toBeUpdatedBlog[0].title},
-			description = ${description || toBeUpdatedBlog[0].description},
-			image= ${imageUrl},
-			blogcontent = ${blogcontent || toBeUpdatedBlog[0].blogcontent},
-			category = ${category || toBeUpdatedBlog[0].category}
+			title = ${req.body.title || toBeUpdatedBlog[0].title},
+			description = ${req.body.description || toBeUpdatedBlog[0].description},
+			image= ${newImageUrl || oldImageUrl},
+			blogcontent = ${req.body.blogcontent || toBeUpdatedBlog[0].blogcontent},
+			category = ${req.body.category || toBeUpdatedBlog[0].category}
 
-			WHERE id = ${id}
+			WHERE id = ${req.params.id}
 			RETURNING *
 			`;
 
-		await sendMsgToRabbitmq("cache-invalidation", [
-			"blogs:*",
-			`blog:${id}`,
-		]);
+		// RABBITMQ DISABLED
+		// await sendMsgToRabbitmq("cache-invalidation", [
+		// 	"blogs:*",
+		// 	`blog:${id}`,
+		// ]);
+
+		console.log("updatedBlog: ", updatedBlog);
 
 		res.json({
 			message: "Blog Updated",
@@ -136,16 +164,16 @@ export const deleteBlog = async (req: any, res: any) => {
 		const Id = req.params.id;
 		const blog = await sql`SELECT * FROM blogs WHERE id = ${Id}`;
 
-		if (!blog.length) {
-			res.status(404).json({
-				message: "No blog with this id",
+		if (blog[0].author !== req.user?._id) {
+			res.status(401).json({
+				message: "You are not author of this blog",
 			});
 			return;
 		}
 
-		if (blog[0].author !== req.user?._id) {
-			res.status(401).json({
-				message: "You are not author of this blog",
+		if (!blog.length) {
+			res.status(404).json({
+				message: "No blog with this id",
 			});
 			return;
 		}
