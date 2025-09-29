@@ -242,7 +242,7 @@ const BlogPage = () => {
 							</Button>
 						)}
 
-						{/* DELETE BUTTON (ONLY FOR OWNER) */}
+						{/* EDIT & DELETE BUTTON (ONLY FOR OWNER) */}
 						{blog?.author === user?._id && (
 							<>
 								<Button
