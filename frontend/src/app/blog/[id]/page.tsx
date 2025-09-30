@@ -52,7 +52,8 @@ type Blog = {
 };
 
 const BlogPage = () => {
-	const { isAuthenticated, user, fetchBlogs } = useContext(AppContext);
+	const { isAuthenticated, user, fetchUser, fetchBlogs } =
+		useContext(AppContext);
 	const router = useRouter();
 	const { id } = useParams();
 	const [blog, setBlog] = useState<Blog | null>(null);
@@ -67,19 +68,41 @@ const BlogPage = () => {
 	const fetchSingleBlog = async () => {
 		try {
 			setIsPageLoading(true);
+			console.log("isAuthenticated: ", isAuthenticated);
 
-			const { data } = await axios.get(
-				`${blog_service_base_url}/api/v1/blog/${id}`
-			);
+			if (isAuthenticated) {
+				const token = Cookies.get("token");
+				const { data } = await axios.get<{
+					blog: Blog;
+					author: User;
+					isSaved: boolean;
+				}>(`${blog_service_base_url}/api/v1/blog/forAuth/${id}`, {
+					headers: {
+						authorization: `Bearer ${token}`,
+					},
+				});
 
-			// after fetching the `blog` and the `author` separately,
-			// response from backend is:
-			// 		const responseData = { blog: blog[0], author: data };
-			// 		res.json(responseData);
-			setBlog(data.blog);
-			// console.log("Single blog: ", data.blog);
-			setBlogAuthor(data.author);
-			// console.log("Author: ", data.author);
+				// after fetching the `blog` and the `author` separately,
+				// response from backend is:
+				// 		const responseData = { blog: blog[0], author: data, isSaved: isSaved };
+				//		res.json(responseData);
+				setBlog(data.blog);
+				setBlogAuthor(data.author);
+				setIsSaved(data.isSaved);
+			}
+			if (!isAuthenticated) {
+				const { data } = await axios.get<{
+					blog: Blog;
+					author: User;
+				}>(`${blog_service_base_url}/api/v1/blog/${id}`);
+
+				// after fetching the `blog` and the `author` separately,
+				// response from backend is:
+				// 		const responseData = { blog: blog[0], author: data};
+				//		res.json(responseData);
+				setBlog(data.blog);
+				setBlogAuthor(data.author);
+			}
 		} catch (error: any) {
 			console.log("❌ error -> fetchSingleBlog(): ", error);
 			if (error.response.status === 404) {
@@ -92,7 +115,7 @@ const BlogPage = () => {
 
 	useEffect(() => {
 		fetchSingleBlog();
-	}, []);
+	}, [isAuthenticated]);
 
 	const deleteBlog = async () => {
 		if (window.confirm("Delete this blog?")) {
@@ -119,6 +142,40 @@ const BlogPage = () => {
 				console.log("error -> deleteBlog(): ", error);
 				setIsFuncLoading(false);
 			}
+		}
+	};
+
+	const saveBlog = async () => {
+		try {
+			setIsFuncLoading(true);
+
+			const token = Cookies.get("token");
+			const { data } = await axios.post(
+				`${blog_service_base_url}/api/v1/save/${id}`,
+				{},
+				// empty body becasue POST request
+				{
+					headers: {
+						authorization: `Bearer ${token}`,
+					},
+				}
+			);
+
+			toast.success(data.message);
+
+			if (data.message === "Blog Saved") {
+				setIsSaved(true);
+			}
+			if (data.message === "Blog Unsaved") {
+				setIsSaved(false);
+			}
+
+			// getSavedBlogs();
+		} catch (error) {
+			toast.error("Problem while saving blog");
+			console.log("Problem while saving blog: ", error);
+		} finally {
+			setIsFuncLoading(false);
 		}
 	};
 
@@ -211,7 +268,6 @@ const BlogPage = () => {
 						{blog?.title}
 					</h1>
 
-					{/* AUTHOR RELATED BUTTONS */}
 					<p className="flex items-center text-gray-600 mt-2 ">
 						{/* AUTHOR NAME */}
 						<Link
@@ -234,8 +290,7 @@ const BlogPage = () => {
 								size={"lg"}
 								disabled={isFuncLoading}
 								onClick={() => {
-									let x: int = 10;
-									// saveBlog();
+									saveBlog();
 								}}
 							>
 								{isSaved ? <FaBookmark /> : <FaRegBookmark />}
@@ -268,6 +323,7 @@ const BlogPage = () => {
 					</p>
 				</CardHeader>
 
+				{/* BLOG CONTENT */}
 				<CardContent>
 					<img
 						src={blog?.image}
