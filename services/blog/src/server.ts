@@ -20,7 +20,9 @@ try {
 // We have some `GET` requests in this microservice.
 // We need a messageConsumer to know about any data change
 // the following will run asynchronously in background
-startMessageConsumer();
+
+// RABBITMQ & REDIS DISABLED TEMPORARILY
+// startMessageConsumer();
 
 app.use("/api/v1", blogRoutes);
 
