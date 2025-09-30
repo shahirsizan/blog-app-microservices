@@ -82,8 +82,6 @@ export const AppContextProvider = ({ children }) => {
 				}
 			);
 
-			// console.log("Context -> User data: ", data);
-
 			setUser(data);
 			setIsAuthenticated(true);
 			setIsLoading(false);
@@ -92,6 +90,10 @@ export const AppContextProvider = ({ children }) => {
 			setIsLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		fetchUser();
+	}, []);
 
 	// LOGOUT USER
 	const logoutUser = async () => {
