@@ -295,12 +295,41 @@ export const saveBlog = async (req: any, res: any) => {
 	}
 };
 
-// export const getSavedBlog = async (req, res) => {
-// 	try {
-// 	} catch (error) {
-// 		console.log("error at : ", error);
-// 		res.status(500).json({
-// 			message: error.message,
-// 		});
-// 	}
-// };
+export const getSavedBlogs = async (req: any, res: any) => {
+	try {
+		const savedEntries =
+			await sql`SELECT * FROM savedblogs WHERE userid=${req.user?._id}`;
+
+		// console.log("savedEntries: ", savedEntries);
+		// savedEntries:  []
+
+		// If no saved blogs, return empty array
+		if (savedEntries.length === 0) {
+			res.status(200).json({
+				message: "No saved blogs",
+				blogs: [],
+			});
+			return;
+		}
+
+		const savedBlogsIds = savedEntries.map((item) => {
+			return item.blogid;
+		});
+
+		const savedBlogsFinal =
+			await sql`SELECT * FROM blogs WHERE id = ANY(${savedBlogsIds})`;
+		// When used with `= ANY`, it is logically equivalent to `IN`. Search google if confused
+
+		// console.log("savedBlogsFinal: ", savedBlogsFinal);
+
+		res.status(200).json({
+			message: "saved blogs fetched successfully",
+			blogs: savedBlogsFinal,
+		});
+	} catch (error: any) {
+		console.log("❌ error -> getSavedBlog(): ", error);
+		res.status(500).json({
+			message: error.message,
+		});
+	}
+};
