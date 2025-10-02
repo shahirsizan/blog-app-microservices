@@ -169,8 +169,6 @@ const BlogPage = () => {
 			if (data.message === "Blog Unsaved") {
 				setIsSaved(false);
 			}
-
-			// getSavedBlogs();
 		} catch (error) {
 			toast.error("Problem while saving blog");
 			console.log("Problem while saving blog: ", error);
